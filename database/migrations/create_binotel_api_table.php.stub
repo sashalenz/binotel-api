@@ -1,0 +1,53 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateBinotelApiTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('binotel_calls', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger('customer_id')->nullable()->index();
+            $table->unsignedInteger('employee_id')->nullable()->index();
+            $table->unsignedInteger('pbx_id')->nullable()->index();
+            $table->timestamp('start_time');
+            $table->integer('call_type')->default(0);
+            $table->integer('internal_number')->nullable()->index();
+            $table->string('internal_additional_data')->nullable();
+            $table->string('external_number')->nullable()->index();
+            $table->string('pbx_number')->nullable()->index();
+            $table->unsignedInteger('waitsec')->nullable();
+            $table->unsignedInteger('billsec')->nullable();
+            $table->string('disposition')->nullable()->index();
+            $table->string('recording_status')->nullable();
+            $table->boolean('is_new_call')->default(0);
+            $table->nullableTimestamps();
+        });
+
+        Schema::create('binotel_call_history', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('binotel_call_id')
+                ->constrained()
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->integer('internal_number')->nullable()->index();
+            $table->string('internal_additional_data')->nullable();
+            $table->unsignedInteger('employee_id')->nullable()->index();
+            $table->unsignedInteger('waitsec')->nullable();
+            $table->unsignedInteger('billsec')->nullable();
+            $table->string('disposition')->nullable()->index();
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('binotel_call_history', function (Blueprint $table) {
+            $table->dropForeign(['binotel_call_id']);
+        });
+        Schema::dropIfExists('binotel_call_history');
+        Schema::dropIfExists('binotel_calls');
+    }
+}

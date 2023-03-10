@@ -1,0 +1,58 @@
+{
+    "name": "sashalenz/binotel-api",
+    "description": "API for Binotel",
+    "keywords": [
+        "sashalenz",
+        "binotel-api",
+        "binotel"
+    ],
+    "homepage": "https://github.com/sashalenz/binotel-api",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oleksandr Petrovskyi",
+            "email": "sashalenz@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1|^8.2",
+        "illuminate/config": "^9.0|^10.0",
+        "illuminate/contracts": "^9.0|^10.0",
+        "illuminate/database": "^9.0|^10.0",
+        "illuminate/http": "^9.0|^10.0",
+        "illuminate/support": "^9.0|^10.0",
+        "propaganistas/laravel-phone": "^5.0",
+        "spatie/data-transfer-object": "^3.7",
+        "spatie/laravel-package-tools": "^1.14"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "nunomaduro/collision": "^6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sashalenz\\Binotel\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sashalenz\\Binotel\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Sashalenz\\Binotel\\BinotelServiceProvider"
+            ],
+            "aliases": {
+                "Binotel": "Sashalenz\\Binotel\\BinotelFacade"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
