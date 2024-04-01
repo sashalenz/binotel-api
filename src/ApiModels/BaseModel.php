@@ -2,10 +2,12 @@
 
 namespace Sashalenz\Binotel\ApiModels;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Sashalenz\Binotel\Exceptions\BinotelException;
 use Sashalenz\Binotel\Request;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 
 abstract class BaseModel
 {
@@ -61,10 +63,9 @@ abstract class BaseModel
     }
 
     /**
-     * @return Collection
      * @throws BinotelException
      */
-    public function request() : Collection
+    public function request(?string $key = null): mixed
     {
         if (is_null($this->method)) {
             throw new BinotelException('API Exception: Provide method first');
@@ -76,6 +77,47 @@ abstract class BaseModel
             return $request->cache($this->cacheSeconds);
         }
 
-        return $request->make();
+        return $request->make($key);
+    }
+
+
+    /**
+     * @throws BinotelException
+     */
+    protected function get(?string $key): mixed
+    {
+        return $this->request($key);
+    }
+
+    /**
+     * @throws BinotelException
+     */
+    protected function first(): array
+    {
+        return $this->request()[0] ?? [];
+    }
+
+    /**
+     * @throws BinotelException
+     */
+    protected function toData(
+        /** @var class-string<BaseData> $class */
+        string $class
+    ): BaseData {
+        return app(DataFromSomethingResolver::class)->execute(
+            $class,
+            $this->first()
+        );
+    }
+
+    /**
+     * @throws BinotelException
+     */
+    protected function toCollection(
+        /** @var class-string<BaseData> $class */
+        string $class,
+        ?string $key = null
+    ): DataCollection {
+        return new DataCollection($class, $this->request($key));
     }
 }

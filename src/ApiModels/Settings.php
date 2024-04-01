@@ -3,27 +3,26 @@
 namespace Sashalenz\Binotel\ApiModels;
 
 use Illuminate\Support\Collection;
-use Sashalenz\Binotel\DataTransferObjects\SettingsEmployeeDataTransferObject;
-use Sashalenz\Binotel\DataTransferObjects\SettingsRouteDataTransferObject;
-use Sashalenz\Binotel\DataTransferObjects\SettingsVoiceFileDataTransferObject;
 use Sashalenz\Binotel\Exceptions\BinotelException;
+use Sashalenz\Binotel\ResponseData\SettingsEmployeeData;
+use Sashalenz\Binotel\ResponseData\SettingsRouteData;
+use Sashalenz\Binotel\ResponseData\SettingsVoiceFileData;
+use Spatie\LaravelData\DataCollection;
 
 final class Settings extends BaseModel
 {
     protected string $model = 'settings';
 
     /**
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function listOfEmployees(): Collection
+    public function listOfEmployees(): DataCollection
     {
-        return SettingsEmployeeDataTransferObject::collectFromArray(
-            $this->method('list-of-employees')
-                ->cache(5)
-                ->request()
-                ->get('listOfEmployees')
-        );
+        return $this
+            ->method('list-of-employees')
+            ->cache(5)
+            ->toCollection(SettingsEmployeeData::class, 'listOfEmployees');
     }
 
     /**
@@ -34,25 +33,23 @@ final class Settings extends BaseModel
     {
         $data = $this->method('list-of-routes')
             ->cache(5)
-            ->request()
             ->get('listOfRoutes');
 
-        return collect($data)->mapWithKeys(fn ($array, $key) => [
-            $key => SettingsRouteDataTransferObject::collectFromArray($array),
-        ]);
+        return collect($data)
+            ->mapWithKeys(fn ($array, $key) => [
+                $key => SettingsRouteData::collect($array),
+            ]);
     }
 
     /**
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function listOfVoiceFiles(): Collection
+    public function listOfVoiceFiles(): DataCollection
     {
-        return SettingsVoiceFileDataTransferObject::collectFromArray(
-            $this->method('list-of-voice-files')
-                ->cache(5)
-                ->request()
-                ->get('listOfEmployees')
-        );
+        return $this
+            ->method('list-of-voice-files')
+            ->cache(5)
+            ->toCollection(SettingsVoiceFileData::class, 'listOfEmployees');
     }
 }

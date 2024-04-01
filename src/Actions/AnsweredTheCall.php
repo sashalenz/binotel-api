@@ -3,8 +3,8 @@
 namespace Sashalenz\Binotel\Actions;
 
 use Illuminate\Http\JsonResponse;
-use Sashalenz\Binotel\DataTransferObjects\Webhook\AnsweredTheCallDataTransferObject;
 use Sashalenz\Binotel\Http\Requests\WebhookRequest;
+use Sashalenz\Binotel\ResponseData\Webhooks\AnsweredTheCallData;
 
 class AnsweredTheCall extends WebhookAction
 {
@@ -15,7 +15,7 @@ class AnsweredTheCall extends WebhookAction
 
     public function transform(WebhookRequest $request): self
     {
-        $this->data = AnsweredTheCallDataTransferObject::fromRequest($request);
+        $this->data = AnsweredTheCallData::from($request);
 
         return $this;
     }

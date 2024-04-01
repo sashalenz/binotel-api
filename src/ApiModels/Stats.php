@@ -2,9 +2,9 @@
 
 namespace Sashalenz\Binotel\ApiModels;
 
-use Illuminate\Support\Collection;
-use Sashalenz\Binotel\DataTransferObjects\StatDataTransferObject;
 use Sashalenz\Binotel\Exceptions\BinotelException;
+use Sashalenz\Binotel\ResponseData\StatData;
+use Spatie\LaravelData\DataCollection;
 
 final class Stats extends BaseModel
 {
@@ -13,249 +13,221 @@ final class Stats extends BaseModel
     /**
      * @param int $startTime
      * @param int $stopTime
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function incomingCallsForPeriod(int $startTime, int $stopTime): Collection
+    public function incomingCallsForPeriod(int $startTime, int $stopTime): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('incoming-calls-for-period')
-                ->params([
-                    'startTime' => $startTime,
-                    'stopTime' => $stopTime,
-                ])
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('incoming-calls-for-period')
+            ->params([
+                'startTime' => $startTime,
+                'stopTime' => $stopTime,
+            ])
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int $startTime
      * @param int $stopTime
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function outgoingCallsForPeriod(int $startTime, int $stopTime): Collection
+    public function outgoingCallsForPeriod(int $startTime, int $stopTime): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('outgoing-calls-for-period')
-                ->params([
-                    'startTime' => $startTime,
-                    'stopTime' => $stopTime,
-                ])
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('outgoing-calls-for-period')
+            ->params([
+                'startTime' => $startTime,
+                'stopTime' => $stopTime,
+            ])
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int $startTime
      * @param int $stopTime
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function calltrackingCallsForPeriod(int $startTime, int $stopTime): Collection
+    public function callTrackingCallsForPeriod(int $startTime, int $stopTime): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('calltracking-calls-for-period')
-                ->params([
-                    'startTime' => $startTime,
-                    'stopTime' => $stopTime,
-                ])
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('calltracking-calls-for-period')
+            ->params([
+                'startTime' => $startTime,
+                'stopTime' => $stopTime,
+            ])
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int $timestamp
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function allIncomingCallsSince(int $timestamp): Collection
+    public function allIncomingCallsSince(int $timestamp): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('all-incoming-calls-since')
-                ->params([
-                    'timestamp' => $timestamp,
-                ])
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('all-incoming-calls-since')
+            ->params([
+                'timestamp' => $timestamp,
+            ])
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int $timestamp
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function allOutgoingCallsSince(int $timestamp): Collection
+    public function allOutgoingCallsSince(int $timestamp): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('all-outgoing-calls-since')
-                ->params([
-                    'timestamp' => $timestamp,
-                ])
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('all-outgoing-calls-since')
+            ->params([
+                'timestamp' => $timestamp,
+            ])
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int $internalNumber
      * @param int $startTime
      * @param int $stopTime
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function listOfCallsByInternalNumberForPeriod(int $internalNumber, int $startTime, int $stopTime): Collection
+    public function listOfCallsByInternalNumberForPeriod(int $internalNumber, int $startTime, int $stopTime): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('list-of-calls-by-internal-number-for-period')
-                ->params([
-                    'internalNumber' => $internalNumber,
-                    'startTime' => $startTime,
-                    'stopTime' => $stopTime,
-                ])
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('list-of-calls-by-internal-number-for-period')
+            ->params([
+                'internalNumber' => $internalNumber,
+                'startTime' => $startTime,
+                'stopTime' => $stopTime
+            ])
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int|null $dayInTimestamp
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function listOfCallsPerDay(int $dayInTimestamp = null): Collection
+    public function listOfCallsPerDay(int $dayInTimestamp = null): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('list-of-calls-per-day')
-                ->params(array_filter([
-                    'dayInTimestamp' => $dayInTimestamp,
-                ]))
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('list-of-calls-per-day')
+            ->params([
+                'dayInTimestamp' => $dayInTimestamp
+            ])
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int $startTime
      * @param int $stopTime
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function listOfCallsForPeriod(int $startTime, int $stopTime): Collection
+    public function listOfCallsForPeriod(int $startTime, int $stopTime): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('list-of-calls-for-period')
-                ->params([
-                    'startTime' => $startTime,
-                    'stopTime' => $stopTime,
-                ])
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('list-of-calls-for-period')
+            ->params([
+                'startTime' => $startTime,
+                'stopTime' => $stopTime,
+            ])
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function listOfLostCallsForToday(): Collection
+    public function listOfLostCallsForToday(): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('list-of-lost-calls-for-today')
-                ->cache(10)
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('list-of-lost-calls-for-today')
+            ->cache(10)
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function onlineCalls(): Collection
+    public function onlineCalls(): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('online-calls')
-                ->cache(5)
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('online-calls')
+            ->cache(5)
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param array $externalNumbers
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function historyByExternalNumber(array $externalNumbers): Collection
+    public function historyByExternalNumber(array $externalNumbers): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('history-by-external-number')
-                ->params([
-                    'externalNumbers' => $externalNumbers,
-                ])
-                ->cache(5)
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('history-by-external-number')
+            ->params([
+                'externalNumbers' => $externalNumbers,
+            ])
+            ->cache(5)
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int|array $customerID
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function historyByCustomerId(int | array $customerID): Collection
+    public function historyByCustomerId(int | array $customerID): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('history-by-customer-id')
-                ->params([
-                    'customerID' => $customerID,
-                ])
-                ->cache(5)
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('history-by-customer-id')
+            ->params([
+                'customerID' => $customerID,
+            ])
+            ->cache(5)
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param int $internalNumber
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function recentCallsByInternalNumber(int $internalNumber): Collection
+    public function recentCallsByInternalNumber(int $internalNumber): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('recent-calls-by-internal-number')
-                ->params([
-                    'internalNumber' => $internalNumber,
-                ])
-                ->cache(5)
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('recent-calls-by-internal-number')
+            ->params([
+                'internalNumber' => $internalNumber,
+            ])
+            ->cache(5)
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
      * @param array $generalCallID
-     * @return Collection
+     * @return DataCollection
      * @throws BinotelException
      */
-    public function callDetails(array $generalCallID): Collection
+    public function callDetails(array $generalCallID): DataCollection
     {
-        return StatDataTransferObject::collectFromArray(
-            $this->method('call-details')
-                ->params([
-                    'generalCallID' => $generalCallID,
-                ])
-                ->cache(10)
-                ->request()
-                ->get('callDetails')
-        );
+        return $this
+            ->method('call-details')
+            ->params([
+                'generalCallID' => $generalCallID,
+            ])
+            ->cache(10)
+            ->toCollection(StatData::class, 'callDetails');
     }
 
     /**
@@ -270,7 +242,6 @@ final class Stats extends BaseModel
                 'generalCallID' => $generalCallID,
             ])
             ->cache(10)
-            ->request()
             ->get('url');
     }
 }

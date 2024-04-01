@@ -27,7 +27,6 @@ final class Calls extends BaseModel
                 'callerIdForEmployee' => ['nullable', 'string'],
                 'async' => ['nullable', 'in:TRUE,FALSE'],
             ])
-            ->request()
             ->get('generalCallID');
     }
 
@@ -47,7 +46,6 @@ final class Calls extends BaseModel
                 'limitCallTime' => ['nullable', 'numeric', 'min:0'],
                 'playbackWaiting' => ['nullable', 'in:TRUE,FALSE'],
             ])
-            ->request()
             ->get('generalCallID');
     }
 
@@ -65,7 +63,6 @@ final class Calls extends BaseModel
                 'pbxNumber' => ['required', 'string', 'size:10'],
                 'pbxNumberInExternalCall' => ['nullable', 'size:10'],
             ])
-            ->request()
             ->get('generalCallID');
     }
 

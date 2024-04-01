@@ -3,8 +3,8 @@
 namespace Sashalenz\Binotel\Actions;
 
 use Illuminate\Http\JsonResponse;
-use Sashalenz\Binotel\DataTransferObjects\Webhook\ApiCallSettingsDataTransferObject;
 use Sashalenz\Binotel\Http\Requests\WebhookRequest;
+use Sashalenz\Binotel\ResponseData\Webhooks\ApiCallSettingsData;
 
 class ApiCallSettings extends WebhookAction
 {
@@ -15,7 +15,7 @@ class ApiCallSettings extends WebhookAction
 
     public function transform(WebhookRequest $request): self
     {
-        $this->data = ApiCallSettingsDataTransferObject::fromRequest($request);
+        $this->data = ApiCallSettingsData::from($request);
 
         return $this;
     }

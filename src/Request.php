@@ -36,41 +36,46 @@ final class Request
     }
 
     /**
-     * @return Collection
      * @throws BinotelException
      */
-    public function make(): Collection
+    public function make(?string $key = null): mixed
     {
         $this->params['key'] = $this->key;
         $this->params['secret'] = $this->secret;
 
-        $link = $this->url . $this->version .'/'. $this->method .'.'. $this->format;
-
         try {
             return Http::timeout(self::TIMEOUT)
+                ->baseUrl($this->url)
                 ->retry(
                     self::RETRY_TIMES,
                     self::RETRY_SLEEP
                 )
                 ->asJson()
                 ->post(
-                    $link,
+                    sprintf('%s/%s.%s', $this->version, $this->method, $this->format),
                     $this->params
                 )
                 ->throw()
-                ->collect();
+                ->json($key);
         } catch (RequestException $e) {
             throw new BinotelException('API Exception: ' . $e->getMessage());
         }
     }
 
-    public function cache(int $seconds = -1) : Collection
+    public function cache(int $seconds = -1) : array
     {
         if ($seconds === -1) {
-            return Cache::rememberForever($this->getCacheKey(), fn () => $this->make());
+            return Cache::rememberForever(
+                $this->getCacheKey(),
+                fn () => $this->make()
+            );
         }
 
-        return Cache::remember($this->getCacheKey(), $seconds, fn () => $this->make());
+        return Cache::remember(
+            $this->getCacheKey(),
+            $seconds,
+            fn () => $this->make()
+        );
     }
 
     private function getCacheKey() : string
