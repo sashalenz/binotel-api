@@ -237,11 +237,13 @@ final class Stats extends BaseModel
      */
     public function callRecord(int $generalCallID): string
     {
-        return $this->method('call-record')
+        $url = $this->method('call-record')
             ->params([
                 'generalCallID' => $generalCallID,
             ])
             ->cache(10)
             ->get('url');
+
+        return $url['url'];
     }
 }
