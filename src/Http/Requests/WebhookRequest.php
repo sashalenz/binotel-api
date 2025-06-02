@@ -50,6 +50,8 @@ class WebhookRequest extends FormRequest
             '185.100.66.145' => 'sip50.binotel.com',
             '185.100.66.146' => 'sip51.binotel.com',
             '185.100.66.147' => 'sip52.binotel.com',
+            '45.91.130.51' => '45.91.130.51',
+            '45.91.130.36' => '45.91.130.36'
         ];
     }
 }
