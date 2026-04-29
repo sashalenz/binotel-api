@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Propaganistas\LaravelPhone\PhoneNumber;
 use Sashalenz\Binotel\Casts\PhoneNumberCast;
+use Sashalenz\Binotel\Casts\TimestampCast;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 
@@ -15,6 +16,7 @@ final class StatData extends Data
         public int $companyID,
         public int $generalCallID,
         public int $callID,
+        #[WithCast(TimestampCast::class)]
         public Carbon $startTime,
         public int $callType,
         public int $waitsec,

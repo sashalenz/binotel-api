@@ -7,21 +7,37 @@ use Propaganistas\LaravelPhone\PhoneNumber;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
+use Throwable;
 
 class PhoneNumberCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): mixed
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): ?PhoneNumber
     {
-        $number = Str::of($value);
-
-        if ($number->startsWith('00')) {
-            return new PhoneNumber($number->replaceFirst('00', '+'));
+        if (blank($value)) {
+            return null;
         }
 
-        if ($number->startsWith('0') && $number->length() === 10) {
-            return new PhoneNumber($number, 'UA');
+        $number = Str::of((string) $value)->trim();
+
+        try {
+            $phone = match (true) {
+                $number->startsWith('+')                                 => new PhoneNumber((string) $number),
+                $number->startsWith('00')                                => new PhoneNumber((string) $number->replaceFirst('00', '+')),
+                $number->startsWith('0') && $number->length() === 10     => new PhoneNumber((string) $number, 'UA'),
+                default                                                  => null,
+            };
+        } catch (Throwable) {
+            return null;
         }
 
-        return null;
+        if ($phone === null) {
+            return null;
+        }
+
+        try {
+            return $phone->isValid() ? $phone : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 }
