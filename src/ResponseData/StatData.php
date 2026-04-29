@@ -13,6 +13,28 @@ use Spatie\LaravelData\Data;
 
 final class StatData extends Data
 {
+    /**
+     * Binotel sometimes returns an empty string `""` for optional nested
+     * objects (customerData, employeeData, callTrackingData, getCallData)
+     * and for the historyData array when there is no associated record.
+     * spatie-laravel-data has no normalizer for `string -> Data`, so we
+     * coerce those `""` to `null` / `[]` before the pipeline runs.
+     */
+    public static function prepareForPipeline(array $properties): array
+    {
+        foreach (['customerData', 'employeeData', 'callTrackingData', 'getCallData'] as $key) {
+            if (($properties[$key] ?? null) === '') {
+                $properties[$key] = null;
+            }
+        }
+
+        if (($properties['historyData'] ?? null) === '') {
+            $properties['historyData'] = [];
+        }
+
+        return $properties;
+    }
+
     public function __construct(
         public int $companyID,
         public int $generalCallID,
