@@ -32,6 +32,16 @@ final class StatData extends Data
             $properties['historyData'] = [];
         }
 
+        // Binotel sometimes returns numeric fields as strings (e.g. internalNumber="801").
+        // Coerce numeric strings to int so the typed `?int` constructor argument accepts them.
+        foreach (['internalNumber'] as $key) {
+            if (isset($properties[$key]) && is_string($properties[$key]) && is_numeric($properties[$key])) {
+                $properties[$key] = (int) $properties[$key];
+            } elseif (($properties[$key] ?? null) === '') {
+                $properties[$key] = null;
+            }
+        }
+
         return $properties;
     }
 
