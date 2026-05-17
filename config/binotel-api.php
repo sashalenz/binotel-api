@@ -20,5 +20,14 @@ return [
     'employee_class' => null,
     'pbx_class' => null,
 
-    'domain' => env('BINOTEL_API_DOMAIN', env('APP_URL'))
+    'domain' => env('BINOTEL_API_DOMAIN', env('APP_URL')),
+
+    'http' => [
+        'timeout' => env('BINOTEL_API_TIMEOUT', 15),
+        'connect_timeout' => env('BINOTEL_API_CONNECT_TIMEOUT', 10),
+        'retry_times' => env('BINOTEL_API_RETRY_TIMES', 5),
+        'retry_sleep' => env('BINOTEL_API_RETRY_SLEEP', 1000),
+        'retry_max_sleep' => env('BINOTEL_API_RETRY_MAX_SLEEP', 15000),
+        'throttle_ms' => env('BINOTEL_API_THROTTLE_MS', 200),
+    ],
 ];

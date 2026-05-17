@@ -2,8 +2,8 @@
 
 namespace Sashalenz\Binotel;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -11,9 +11,7 @@ use Sashalenz\Binotel\Exceptions\BinotelException;
 
 final class Request
 {
-    private const TIMEOUT = 3;
-    private const RETRY_TIMES = 3;
-    private const RETRY_SLEEP = 100;
+    private static ?float $lastRequestAt = null;
 
     private string $key;
     private string $secret;
@@ -43,12 +41,40 @@ final class Request
         $this->params['key'] = $this->key;
         $this->params['secret'] = $this->secret;
 
+        $timeout = (int) Config::get('binotel-api.http.timeout', 15);
+        $connectTimeout = (int) Config::get('binotel-api.http.connect_timeout', 10);
+        $retryTimes = (int) Config::get('binotel-api.http.retry_times', 5);
+        $retrySleep = (int) Config::get('binotel-api.http.retry_sleep', 1000);
+        $retryMaxSleep = (int) Config::get('binotel-api.http.retry_max_sleep', 15000);
+
+        $this->throttle();
+
         try {
-            return Http::timeout(self::TIMEOUT)
+            return Http::timeout($timeout)
+                ->connectTimeout($connectTimeout)
                 ->baseUrl($this->url)
                 ->retry(
-                    self::RETRY_TIMES,
-                    self::RETRY_SLEEP
+                    $retryTimes,
+                    function (int $attempt) use ($retrySleep, $retryMaxSleep): int {
+                        $backoff = $retrySleep * (2 ** ($attempt - 1));
+                        $capped = min($backoff, $retryMaxSleep);
+
+                        return $capped + random_int(0, (int) max(1, $capped * 0.1));
+                    },
+                    function (\Throwable $exception): bool {
+                        if ($exception instanceof ConnectionException) {
+                            return true;
+                        }
+
+                        if ($exception instanceof RequestException) {
+                            $status = $exception->response->status();
+
+                            return $status === 429 || $status >= 500;
+                        }
+
+                        return false;
+                    },
+                    throw: false
                 )
                 ->asJson()
                 ->post(
@@ -57,8 +83,12 @@ final class Request
                 )
                 ->throw()
                 ->json($key);
+        } catch (ConnectionException $e) {
+            throw new BinotelException('API Exception: ' . $e->getMessage());
         } catch (RequestException $e) {
             throw new BinotelException('API Exception: ' . $e->getMessage());
+        } finally {
+            self::$lastRequestAt = microtime(true);
         }
     }
 
@@ -76,6 +106,21 @@ final class Request
             $seconds,
             fn () => $this->make()
         );
+    }
+
+    private function throttle(): void
+    {
+        $gap = (int) Config::get('binotel-api.http.throttle_ms', 0);
+
+        if ($gap <= 0 || self::$lastRequestAt === null) {
+            return;
+        }
+
+        $elapsedMs = (microtime(true) - self::$lastRequestAt) * 1000;
+
+        if ($elapsedMs < $gap) {
+            usleep((int) (($gap - $elapsedMs) * 1000));
+        }
     }
 
     private function getCacheKey() : string
